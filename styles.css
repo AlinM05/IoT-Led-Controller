@@ -1,0 +1,108 @@
+body {
+    background-color: #212529;
+}
+html {
+    font-family: Helvetica;
+    display: inline-block;
+}
+
+h1 {
+    color: white;
+}
+
+p {
+    color: white;
+}
+
+
+.text-decoration {
+    font-size: 30px;
+    margin: 2px;
+    cursor: pointer;
+}
+
+form {
+    display: flex;
+    justify-content: center;
+}
+
+.alert-success {
+    padding: 0.5rem 0.5rem;
+    font-size: 0.875rem;
+    max-width: 11rem;
+    display: flex;
+    justify-content: center;
+}
+
+.form-select {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    max-width: 300px;
+    display: inline-block;
+}
+
+section {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 100%;
+    display: none;
+    padding: 20px;
+}
+
+#rgbColorPicker {
+    appearance: none; 
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    width: 60px; 
+    height: 60px; 
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#rgbColorPicker:hover {
+    border-color: #888;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05); 
+}
+
+#rgbColorPicker:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 8px #007bff;
+}
+
+.webserver, .webresponse, .client {
+    width: 45%;
+    height: 45%;
+}
+
+p > em {
+    font-size: 30px;
+}
+
+section > p {
+    text-align: center;
+}
+
+img {
+    margin-left: 25%;
+    margin-right: 25%;
+}
+
+.circuit {
+    display: flex;
+    justify-content: center;
+    padding-left: 150px;
+}
+
+.alert {
+    margin-left: 45%;
+}
+
+code {
+    display: inline-block;
+    margin-left: 25%;
+    margin-right: 25%;
+}

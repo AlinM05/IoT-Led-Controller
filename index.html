@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:,">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" 
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+<body>
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+          <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" 
+          role="tab" aria-controls="nav-profile" aria-selected="false">Features</button>
+          <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" 
+          role="tab" aria-controls="nav-profile" aria-selected="true">Documentation</button>
+        </div>
+    </nav>
+
+    <section id="Features">
+        <center><h1>Control Panel</h1></center><br><br>
+        <form onsubmit="return false;">
+            <center>
+                <button type="button" class="btn btn-outline-success" onclick="toggleLed('on')">LED ON</button>
+                <button type="button" class="btn btn-outline-danger" onclick="toggleLed('off')">LED OFF</button>
+            </center>
+        </form><br>
+
+        <div class="alert alert-success" role="alert">
+            Led is <strong>{led_state}</strong>
+        </div><br><br>
+
+        <center>
+            <h1>RGB Selector</h1><br>
+        </center>
+        <form onsubmit="return false;">
+            <center>
+                <input type="color" id="rgbColorPicker" onchange="setRgbLedColor(this.value)" style="margin-left: 20px;">
+            </center>
+        </form>
+    </section>
+
+    <section id="Documentation">
+        <center>
+            <h1>Documentation</h1>
+        </center><br><br>
+
+        <p><em>The Raspberry Pi Pico as a Web Server</em></p>
+        <img src="./images/WebServer.png" alt="" class="webserver"><br><br>
+        <p>In simple terms, a web server is a "computer" that provides web pages. It stores the website files, 
+            including all HTML documents and related assets like images, CSS, JavaScript, fonts, or other files. 
+            It also brings those files to the user web browser device when the user makes a request to the server.</p><br><br><br>
+
+        <p><em>How it works?</em></p>
+        <p>When you access the Raspberry Pi Pico's address in your web browser, you're sending a request to the root URL
+             of the Raspberry Pi Pico. Upon receiving this request, the Pico responds by sending the HTML required to construct 
+             the web page displayed in the browser.</p>
+        <img src="./images/WebResponse.png" alt="" class="webresponse">
+        <p>When you (the client) enter the Raspberry Pi Pico address on your web browser, you are making 
+            a request to the Raspberry Pi Pico on the root URL. When it receives that request, 
+            it responds with the HTML to build the web page we have seen previously.</p>
+        <img src="./images/Client.png" alt="" class="client">
+        <p></p><br><br>
+
+        <p><em>Circuit</em></p>
+        <img src="./images/Circuit.PNG" alt="" class = circuit>
+        <br><br>
+
+        <p><em>How does the code work?</em></p>
+        <p>This Python file defines the control logic for the IoT project, 
+            including management of an RGB LED, a simple LED, as well as an integrated web server for interaction.</p>
+            <p>Imports and initial setup:</p>
+            <pre>
+                <code>
+                    import time
+                    import network # type: ignore
+                    import socket
+                    import ujson # type: ignore
+                    from machine import Pin, PWM # type: ignore
+                </code>
+            </pre>
+
+            <p>set_rgb_color function:</p>
+            <p>Converts to a HEX color to RGB component adjusting the values for a 16-bit range</p>
+            <pre>
+                <code code="language-Python">
+                    def set_rgb_color(hex_color):
+                    r = int(hex_color[0:2], 16)
+                    g = int(hex_color[2:4], 16)
+                    b = int(hex_color[4:6], 16)
+                    rgb_red.duty_u16(int(r / 255 * 65535))
+                    rgb_green.duty_u16(int(g / 255 * 65535))
+                    rgb_blue.duty_u16(int(b / 255 * 65535))
+                </code>
+            </pre>
+
+            <p>File reading:</p>
+            <p>Reads the configuration files or static files and return the content</p>
+            <pre>
+                <code>
+                    def get_file(file_name, encoding_type=None):
+                        try:
+                            if 'json' in file_name:
+                                with open(file_name, 'r', encoding=encoding_type) as secrets:
+                                    file_content = ujson.load(secrets)
+                                return file_content
+                            else:
+                                with open(file_name, 'r', encoding=encoding_type) as file:
+                                    file_content = file.read()
+                                return file_content
+                        except FileNotFoundError:
+                            print(f"Error: The file {file_name} was not found.")
+                            return None
+                </code>
+            </pre>
+
+            <p>Wifi setup:</p>
+            <p>Reads WiFi credentials from connections.json file and connects to the WiFi network</p>
+            <pre>
+                <code>
+                    wlan = network.WLAN(network.STA_IF)
+                    wlan.active(True)
+                    wlan.connect(ssid, password)
+                </code>
+            </pre>
+
+            <p>Web Server Initialization:</p>
+            <p>Creates a socket to listen on port 80 (HTTP) in order to handle HTTP requests</p>
+            <pre>
+                <code>
+                    addr = socket.getaddrinfo("0.0.0.0", 80)[0][-1]
+                    s = socket.socket()
+                    s.bind(addr)
+                    s.listen(1)
+                </code>
+            </pre>
+
+            <p>Handling HTTP Requests:</p>
+            <p>Proccess the HTTP request for: led=on, led=off or rgb=HEX</p>
+            <pre>
+                <code>
+                    if "led=on" in request:
+                        led.value(1)
+                        cl.send("HTTP/1.0 302 Found\r\nLocation: /\r\n\r\n")
+                    if "led=off" in request:
+                        led.value(0)
+                        cl.send("HTTP/1.0 302 Found\r\nLocation: /\r\n\r\n")
+                    if "rgb=" in request:
+                        rgb_value = request.split("rgb=")[-1][:6]
+                        set_rgb_color(rgb_value)
+                        cl.send("HTTP/1.0 302 Found\r\nLocation: /\r\n\r\n")
+                </code>
+            </pre>
+
+            <p>Serving Files to the client:</p>
+            <p>This function serves CSS and JavaScript files when requested and HTML file with the current state of request</p>
+            <pre>
+                <code>
+                    if "GET /styles.css" in request:
+                        cl.send("HTTP/1.0 200 OK\r\nContent-type: text/css\r\n\r\n")
+                        cl.sendall(css)
+                    elif "GET /script.js" in request:
+                        cl.send("HTTP/1.0 200 OK\r\nContent-type: application/javascript\r\n\r\n")
+                        cl.sendall(script)
+                    elif "GET /" in request:
+                        response = html.format(led_state=ledState)
+                        cl.send("HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n")
+                        cl.sendall(response)
+                </code>
+            </pre>
+            <pre>
+                <code>
+                WLAN code:
+                    0: WLAN is not enabled
+                    1: WLAN is currently scanning for networks
+                    2: WLAN is connecting to a network
+                    3: WLAN is connected to a network
+                    4: WLAN failed to connect to a network
+                </code>
+            </pre>
+    </section>
+
+</body>
+<script src="./script.js"></script>
+</html>
